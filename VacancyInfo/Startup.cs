@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using VacancyInfo.Services;
 
 namespace VacancyInfo
 {
@@ -23,6 +24,8 @@ namespace VacancyInfo
 
             services.AddControllersWithViews();
 
+            services.AddTransient<IRequestServices,RequestServices>();
+
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -36,6 +39,7 @@ namespace VacancyInfo
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
             }
             else
             {
@@ -44,6 +48,7 @@ namespace VacancyInfo
                 app.UseHsts();
             }
 
+            app.UseStatusCodePages();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
