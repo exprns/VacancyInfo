@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace VacancyInfo.Services
 {
@@ -18,27 +19,27 @@ namespace VacancyInfo.Services
             _httpClientFactory = httpClientFactory;
         }
 
-        public async void SendRequest(HttpRequestMessage request, string clientName)
+        public async Task<Stream> SendRequest(HttpRequestMessage request, string clientName)
         {
-            var client = _httpClientFactory.CreateClient(clientName);
+            var client = _httpClientFactory.CreateClient();
             var response = await client.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                Result = responseStream;
+                var responseStream = await response.Content.ReadAsStreamAsync();
+                return responseStream;
             }
             else
             {
                 GetPullRequestsError = true;
-                Result = Stream.Null;
+                return Stream.Null;
             }
         }
     }
 
     public interface IRequestServices
     {
-        public void SendRequest(HttpRequestMessage request, string clientName);
+        public Task<Stream> SendRequest(HttpRequestMessage request, string clientName);
         public bool GetPullRequestsError { get; set; }
         public Stream Result { get; set; }
     }

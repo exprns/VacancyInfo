@@ -22,12 +22,9 @@ namespace VacancyInfo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllersWithViews();
             services.AddHttpClient();
             services.AddTransient<IRequestServices,RequestServices>();
-
-
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

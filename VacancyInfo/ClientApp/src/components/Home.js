@@ -5,7 +5,7 @@ export const Home = () => {
     const [text, setText] = useState('');
 
     const getFoo = () => {
-        fetch(`vacancy?vacancyName=${text}`).then(res => console.log(res)).catch(err => console.error(err))
+        fetch(`api/Vacancy/${text}`).then(res => console.log(res)).catch(err => console.error(err))
     }
 
     const handleText = (e) => setText(e.target.value)
