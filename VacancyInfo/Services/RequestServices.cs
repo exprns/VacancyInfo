@@ -12,6 +12,7 @@ namespace VacancyInfo.Services
         public Stream Result { get; set; }
         public bool GetPullRequestsError { get; set; }
         private IHttpClientFactory _httpClientFactory;
+
         public RequestServices(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;

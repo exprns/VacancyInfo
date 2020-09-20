@@ -19,7 +19,7 @@ namespace VacancyInfo.Controllers
 
         // GET api/<VacancyController>/5
         [HttpGet("{vacancyName}")]
-        public List<HHVacancyModel> Get(string vacancyName)
+        public string Get(string vacancyName)
         {
             string requestBody = _hhName + "?text" + vacancyName;
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestBody);
@@ -27,12 +27,13 @@ namespace VacancyInfo.Controllers
             _requestServices.SendRequest(request, clientName);
             if (!_requestServices.GetPullRequestsError)
             {
-                return null;
+                return "VseNorm";
                 //return _requestServices.Result;
             }
             else
             {
-                return new List<HHVacancyModel>();
+                //return new List<HHVacancyModel>();
+                return "ErrorRequest";
             }
             
         }
