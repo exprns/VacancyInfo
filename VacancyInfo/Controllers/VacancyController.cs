@@ -27,7 +27,8 @@ namespace VacancyInfo.Controllers
             _requestServices.SendRequest(request, clientName);
             if (!_requestServices.GetPullRequestsError)
             {
-                return _requestServices.result;
+                return null;
+                //return _requestServices.Result;
             }
             else
             {

@@ -9,7 +9,7 @@ namespace VacancyInfo.Services
 {
     public class RequestServices : IRequestServices
     {
-        public Stream requestValue { get; set; }
+        public Stream Result { get; set; }
         public bool GetPullRequestsError { get; set; }
         private IHttpClientFactory _httpClientFactory;
         public RequestServices(IHttpClientFactory httpClientFactory)
@@ -25,12 +25,12 @@ namespace VacancyInfo.Services
             if (response.IsSuccessStatusCode)
             {
                 using var responseStream = await response.Content.ReadAsStreamAsync();
-                requestValue = responseStream;
+                Result = responseStream;
             }
             else
             {
                 GetPullRequestsError = true;
-                requestValue = Stream.Null;
+                Result = Stream.Null;
             }
         }
     }
@@ -39,6 +39,6 @@ namespace VacancyInfo.Services
     {
         public void SendRequest(HttpRequestMessage request, string clientName);
         public bool GetPullRequestsError { get; set; }
-        public Stream requestValue { get; set; }
+        public Stream Result { get; set; }
     }
 }
