@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace VacancyInfo.Services
 {
-    public class RequestServices : IRequestServices
+    public class RequestService : IRequestServices
     {
         public Stream Result { get; set; }
         public bool GetPullRequestsError { get; set; }
         private IHttpClientFactory _httpClientFactory;
 
-        public RequestServices(IHttpClientFactory httpClientFactory)
+        public RequestService(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<Stream> SendRequest(HttpRequestMessage request, string clientName)
+        public async Task<Stream> SendRequest(HttpRequestMessage request)
         {
             var client = _httpClientFactory.CreateClient();
             var response = await client.SendAsync(request);
@@ -39,7 +39,7 @@ namespace VacancyInfo.Services
 
     public interface IRequestServices
     {
-        public Task<Stream> SendRequest(HttpRequestMessage request, string clientName);
+        public Task<Stream> SendRequest(HttpRequestMessage request);
         public bool GetPullRequestsError { get; set; }
         public Stream Result { get; set; }
     }

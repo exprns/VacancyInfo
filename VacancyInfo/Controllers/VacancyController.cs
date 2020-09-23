@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VacancyInfo.Services;
 
@@ -11,41 +14,30 @@ namespace VacancyInfo.Controllers
     [ApiController]
     public class VacancyController : ControllerBase
     {
-        private string _hhName = "https://api.hh.ru/vacancies";
+        private IVacancyService _vacancyService;
         private IRequestServices _requestServices;
 
-        public VacancyController(IRequestServices requestServices)
+        public VacancyController(IRequestServices requestServices, IVacancyService vacancyService)
         {
             _requestServices = requestServices;
+            _vacancyService = vacancyService;
         }
 
-        // GET api/<VacancyController>/5
-        [HttpGet("{vacancyName}")]
-        public async System.Threading.Tasks.Task<string> GetAsync(string vacancyName)
+        // GET api/Vacancy/GetVacancies?name=5
+        [HttpGet("GetVacancies")]
+        public async Task<List<HHVacancyModel>> GetVacanciesAsync(string name)
         {
-            string requestBody = _hhName + "?text=" + vacancyName;
-            var request = new HttpRequestMessage(HttpMethod.Get, requestBody);
-            request.Headers.Add("Accept", "application/vnd.github.v3+json"); //  нужно ли это вообще???????????
-            request.Headers.Add("User-Agent", "HttpClientFactory-Sample"); 
-            string clientName = "hh";
-            var responce =  await _requestServices.SendRequest(request, clientName);
-            if (!_requestServices.GetPullRequestsError)
-            {
-                using (FileStream fs = new FileStream("requestAnswer.json", FileMode.OpenOrCreate))
-                {
-                    responce.Seek(0,SeekOrigin.Begin);
-                    responce.CopyTo(fs);
-                    fs.Close();
-                }
-                return "VseNorm";
-                //return _requestServices.Result;
-            }
-            else
-            {
-                //return new List<HHVacancyModel>();
-                return "ErrorRequest";
-            }
-            
+            await _vacancyService.GetVacancies(name);
+            return new List<HHVacancyModel>(); // TODO: думаю тут сделать ответ о том что данные получены и можно строить графики
         }
+
+        // GET api/Vacancy/GetAvarageSalary
+        [HttpGet("GetAvarageSalary",Name ="getAvarageSalary")]
+        public decimal GetAverageSalary()
+        {
+            return _vacancyService.GetAverageSalary();
+        }
+
+
     }
 }

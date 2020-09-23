@@ -24,8 +24,8 @@ namespace VacancyInfo
         {
             services.AddControllersWithViews();
             services.AddHttpClient();
-            services.AddTransient<IRequestServices,RequestServices>();
-
+            services.AddTransient<IRequestServices,RequestService>();
+            services.AddSingleton<IVacancyService, VacancyService>();
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -39,7 +39,6 @@ namespace VacancyInfo
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
             }
             else
             {
