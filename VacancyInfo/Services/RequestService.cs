@@ -19,8 +19,12 @@ namespace VacancyInfo.Services
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<Stream> SendRequest(HttpRequestMessage request)
+        public async Task<Stream> SendRequest(string requestBody)
         {
+            var request = new HttpRequestMessage(HttpMethod.Get, requestBody);
+
+            request.Headers.Add("Accept", "application/vnd.github.v3+json");
+            request.Headers.Add("User-Agent", "HttpClientFactory-Sample");
             var client = _httpClientFactory.CreateClient();
             var response = await client.SendAsync(request);
 
@@ -39,7 +43,7 @@ namespace VacancyInfo.Services
 
     public interface IRequestServices
     {
-        public Task<Stream> SendRequest(HttpRequestMessage request);
+        public Task<Stream> SendRequest(string requestBody);
         public bool GetPullRequestsError { get; set; }
         public Stream Result { get; set; }
     }

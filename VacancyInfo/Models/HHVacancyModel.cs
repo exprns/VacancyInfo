@@ -7,27 +7,15 @@ using System.Threading.Tasks;
 using VacancyInfo.Models;
 using VacancyInfo.Models.HHModels;
 
-namespace VacancyInfo
+namespace VacancyInfo.Models
 {
-    public class Items
-    {
-        public List<HHVacancyModel> items { get; set; } // HHVacancyModel[]
-        public int? found { get; set; }
-        public int? pages { get; set; }
-        public int? per_page { get; set; }
-        public int? page { get; set; }
-        public object clusters { get; set; }
-        public object arguments { get; set; }
-        public string alternate_url { get; set; }
-}
-
     public class HHVacancyModel
     {
         public string id { get; set; }// Идентификатор вакансии
         public string description { get; set; } // Описание вакансии, содержит html
         public string branded_description { get; set; }//  	Брендированное описание вакансии
         // TODO: key_skills проверить
-        public object key_skills { get; set; }//Информация о ключевых навыках, заявленных в вакансии.Список может быть пустым. 
+        public Key_Skills[] key_skills { get; set; }//Информация о ключевых навыках, заявленных в вакансии.Список может быть пустым. 
         // public string key_skills[].name   { get; set; }// название ключевого навыка
         public Schedule schedule { get; set; }// График работы.Элемент справочника schedule
         // schedule.id { get; set; }//  Идентификатор графика работы
@@ -100,11 +88,15 @@ namespace VacancyInfo
 
         public bool accept_temporary { get; set; }
 
-        public static async Task<Items> ConvertFromStreamAsync(Stream stream)
+        public static async Task<HHVacancyModel> ConvertFromStreamAsync(Stream stream)
         {
             return await JsonSerializer.DeserializeAsync
-                <Items>(stream);
+                <HHVacancyModel>(stream);
         }
+
+        public static HHVacancyModel NullObject() => new HHVacancyModel();
+
+        public bool IsNull(HHVacancyModel model) => model == new HHVacancyModel();
     }
 
 }

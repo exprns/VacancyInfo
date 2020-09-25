@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using VacancyInfo.Models;
 using VacancyInfo.Services;
 
 namespace VacancyInfo.Controllers
@@ -15,20 +16,26 @@ namespace VacancyInfo.Controllers
     public class VacancyController : ControllerBase
     {
         private IVacancyService _vacancyService;
-        private IRequestServices _requestServices;
 
-        public VacancyController(IRequestServices requestServices, IVacancyService vacancyService)
+        public VacancyController(IVacancyService vacancyService)
         {
-            _requestServices = requestServices;
             _vacancyService = vacancyService;
         }
 
-        // GET api/Vacancy/GetVacancies?name=5
-        [HttpGet("GetVacancies")]
+        // GET api/Vacancy/Vacancies?name=5
+        [HttpGet("Vacancies")]
         public async Task<List<HHVacancyModel>> GetVacanciesAsync(string name)
         {
             await _vacancyService.GetVacancies(name);
             return new List<HHVacancyModel>(); // TODO: думаю тут сделать ответ о том что данные получены и можно строить графики
+        }
+
+        // GET api/Vacancy/VacanciesInDetail
+        [HttpGet("VacanciesInDetail")]
+        public async Task<List<HHVacancyModel>> GetVacanciesInDetailAsync()
+        {
+            
+            return _vacancyService.VacanciesInDetail;
         }
 
         // GET api/Vacancy/GetAvarageSalary
