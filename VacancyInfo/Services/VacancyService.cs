@@ -9,8 +9,7 @@ using VacancyInfo.Models;
 namespace VacancyInfo.Services
 {    public interface IVacancyService
     {
-        public Task<List<HHVacancyModel>> GetVacancies(string vacancyName, int page = 0);
-        public decimal GetAverageSalary();
+        public Task<List<HHVacancyModel>> GetVacancies(string vacancyName, string region, int page = 0);
         public List<HHVacancyModel> VacanciesWithSalary { get; }
         public List<HHVacancyModel> VacanciesInDetail { get; }
     }
@@ -43,9 +42,13 @@ namespace VacancyInfo.Services
             _vacanciesInDetail = new List<HHVacancyModel>();
         }
 
-        public async Task<List<HHVacancyModel>> GetVacancies(string vacancyName, int page = 0)
+        public async Task<List<HHVacancyModel>> GetVacancies(string vacancyName, string region, int page = 0)
         {
             string requestBody = _hhVacancyRequest + "?text=" + vacancyName;
+            if(region != "")
+            {
+                requestBody += "&&" + region;
+            }
             requestBody += "&per_page=" + vacanciesPerPage;
 
             var responce = await _requestServices.SendRequest(requestBody);
@@ -56,7 +59,7 @@ namespace VacancyInfo.Services
                 if (items.pages != 0 && page < items.pages)
                 {
                     _vacancies.AddRange(items.items);
-                    await GetVacancies(vacancyName, page + 1);
+                    await GetVacancies(vacancyName, region, ++page);
                 }
             }
             else
@@ -85,15 +88,6 @@ namespace VacancyInfo.Services
             if (!_requestServices.GetPullRequestsError)
                 return await HHVacancyModel.ConvertFromStreamAsync(responce);
             return HHVacancyModel.NullObject();
-        }
-
-        public decimal GetAverageSalary()
-        {
-            var vacanciesWithSalary = VacanciesWithSalary;
-            decimal avgFrom = vacanciesWithSalary.Sum(x => x.salary.from.Value) / vacanciesWithSalary.Count;
-            decimal avgTo = vacanciesWithSalary.Sum(x => x.salary.to.Value) / vacanciesWithSalary.Count;
-
-            return (avgFrom + avgTo) / 2;
         }
     }
 }
