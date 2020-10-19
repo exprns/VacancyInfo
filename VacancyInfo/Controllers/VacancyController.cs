@@ -45,6 +45,13 @@ namespace VacancyInfo.Controllers
             return _vacancyData.GetAverageSalary();
         }
 
-
+        // GET api/Vacancy/GetAverageSalary?areaId=2
+        [HttpGet("GetAverageRegionSalary", Name = "getAverageRegionSalary")]
+        public decimal GetAverageRegionSalary(int areaId)
+        {
+            var areas =  _vacancyData.GetAreas();
+            var regsWithSalaries =  _vacancyData.GetRegionSalary(areas.First());
+            return regsWithSalaries;
+        }
     }
 }

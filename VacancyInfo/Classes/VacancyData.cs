@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VacancyInfo.Models;
+using VacancyInfo.Models.HHModels;
 using VacancyInfo.Services;
 
 namespace VacancyInfo.Classes
@@ -12,8 +13,8 @@ namespace VacancyInfo.Classes
         Task<List<HHVacancyModel>> GetVacanciesAsync(string name, string region = "");
         Task<List<HHVacancyModel>> GetVacanciesInDetailAsync();
         decimal GetAverageSalary();
-        Dictionary<int, decimal> GetRegionsSalaries();
-        decimal GetRegionSalary(int regionID);
+        Dictionary<Area, decimal> GetRegionsSalaries();
+        decimal GetRegionSalary(Area area);
     }
 
     public class VacancyData : IVacancyData
@@ -48,9 +49,9 @@ namespace VacancyInfo.Classes
             return (avgFrom + avgTo) / 2;
         }
 
-        public Dictionary<int, decimal> GetRegionsSalaries()
+        public Dictionary<Area, decimal> GetRegionsSalaries()
         {
-            Dictionary<int, decimal> avgSalaryByReg = new Dictionary<int, decimal>();
+            Dictionary<Area, decimal> avgSalaryByReg = new Dictionary<Area, decimal>();
             foreach(var regionVacancies in _vacancyService.VacanciesByRegionWithSalary)
             {
                 avgSalaryByReg.Add(regionVacancies.Key, GetRegionSalary(regionVacancies.Key));
@@ -58,6 +59,10 @@ namespace VacancyInfo.Classes
             return avgSalaryByReg;
         }
 
-        public decimal GetRegionSalary(int regionID) => GetAverageSalary(_vacancyService.VacanciesByRegionWithSalary[regionID]);
+        public decimal GetRegionSalary(Area area) => GetAverageSalary(_vacancyService.VacanciesByRegionWithSalary[area]);
+
+        public List<Area> GetAreas() => _vacancyService.Areas;
+
+
     }
 }
