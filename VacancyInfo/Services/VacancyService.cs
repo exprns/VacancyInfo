@@ -45,7 +45,9 @@ namespace VacancyInfo.Services
             {
                 if (_areas != null)
                     return _areas;
-                _areas = _vacancies.Select(x=>x.area).Distinct().ToList();
+                _areas = _vacancies.Select(x=>x.area).GroupBy(p => int.Parse(p.id))
+                          .Select(g => g.First())
+                          .ToList();
                 return _areas;
             }
         }

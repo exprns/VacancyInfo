@@ -8,6 +8,13 @@ using System.Threading.Tasks;
 
 namespace VacancyInfo.Services
 {
+    public interface IRequestServices
+    {
+        public Task<Stream> SendRequest(string requestBody);
+        public bool GetPullRequestsError { get; set; }
+        public Stream Result { get; set; }
+    }
+
     public class RequestService : IRequestServices
     {
         public Stream Result { get; set; }
@@ -39,12 +46,5 @@ namespace VacancyInfo.Services
                 return Stream.Null;
             }
         }
-    }
-
-    public interface IRequestServices
-    {
-        public Task<Stream> SendRequest(string requestBody);
-        public bool GetPullRequestsError { get; set; }
-        public Stream Result { get; set; }
     }
 }

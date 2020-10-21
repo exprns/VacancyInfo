@@ -25,6 +25,7 @@ namespace VacancyInfo
             services.AddControllersWithViews();
             services.AddHttpClient();
             services.AddTransient<IRequestServices,RequestService>();
+            services.AddTransient<IJsonService, JsonService>();
             services.AddSingleton<IVacancyService, VacancyService>();
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

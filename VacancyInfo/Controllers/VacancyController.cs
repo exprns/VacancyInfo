@@ -1,11 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using VacancyInfo.Classes;
 using VacancyInfo.Models;
 using VacancyInfo.Services;
@@ -17,25 +14,27 @@ namespace VacancyInfo.Controllers
     public class VacancyController : ControllerBase
     {
         private VacancyData _vacancyData;
+        private IJsonService _jsonService;
 
-        public VacancyController(IVacancyService vacancyService)
+        public VacancyController(IVacancyService vacancyService, IJsonService jsonService)
         {
             _vacancyData = new VacancyData(vacancyService);
+            _jsonService = jsonService;
         }
 
         // GET api/Vacancy/Vacancies?name=5
         [HttpGet("Vacancies")]
-        public async Task<List<HHVacancyModel>> GetVacanciesAsync(string name, string region ="")
+        public async Task<string> GetVacanciesAsync(string name)
         {
-            await _vacancyData.GetVacanciesAsync(name, region);
-            return new List<HHVacancyModel>(); // TODO: думаю тут сделать ответ о том что данные получены и можно строить графики
+            await _vacancyData.GetVacanciesAsync(name);
+            return ""; // TODO: думаю тут сделать ответ о том что данные получены и можно строить графики
         }
 
         // GET api/Vacancy/VacanciesInDetail
         [HttpGet("VacanciesInDetail")]
-        public async Task<List<HHVacancyModel>> GetVacanciesInDetailAsync()
-        {            
-            return await _vacancyData.GetVacanciesInDetailAsync();
+        public List<HHVacancyModel> GetVacanciesInDetail()
+        {
+            return _vacancyData.GetVacanciesInDetail();
         }
 
         // GET api/Vacancy/GetAvarageSalary
@@ -45,13 +44,33 @@ namespace VacancyInfo.Controllers
             return _vacancyData.GetAverageSalary();
         }
 
-        // GET api/Vacancy/GetAverageSalary?areaId=2
+        // GET api/Vacancy/GetAverageRegionSalary?areaId=2
         [HttpGet("GetAverageRegionSalary", Name = "getAverageRegionSalary")]
         public decimal GetAverageRegionSalary(int areaId)
         {
             var areas =  _vacancyData.GetAreas();
-            var regsWithSalaries =  _vacancyData.GetRegionSalary(areas.First());
-            return regsWithSalaries;
+            var regSalaries =  _vacancyData.GetRegionSalary(areas.First(x=>int.Parse(x.id) == areaId));
+            return regSalaries;
         }
+
+        // GET api/Vacancy/GetAreasJson
+        [HttpGet("GetAreasJson", Name = "getAreasJson")]
+        public string GetAreasJson()
+        {
+            var areas = _vacancyData.GetAreas();
+
+            string areasJson = _jsonService.JsonSerializeAllUnicode(areas);
+            return areasJson;
+        }
+
+        // GET api/Vacancy/GetVacanciesByRegionWithSalaryJson
+        [HttpGet("GetVacanciesByRegionWithSalaryJson", Name = "getVacanciesByRegionWithSalaryJson")]
+        public string GetVacanciesByRegionWithSalaryJson() 
+        { 
+            var vacs =  _vacancyData.GetVacanciesByRegionWithSalary();
+            string jsonVacs = _jsonService.JsonSerialize(vacs);
+            return jsonVacs;
+        }
+
     }
 }

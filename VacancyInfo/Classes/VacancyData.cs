@@ -11,7 +11,7 @@ namespace VacancyInfo.Classes
     public interface IVacancyData
     {
         Task<List<HHVacancyModel>> GetVacanciesAsync(string name, string region = "");
-        Task<List<HHVacancyModel>> GetVacanciesInDetailAsync();
+        List<HHVacancyModel> GetVacanciesInDetail();
         decimal GetAverageSalary();
         Dictionary<Area, decimal> GetRegionsSalaries();
         decimal GetRegionSalary(Area area);
@@ -32,15 +32,12 @@ namespace VacancyInfo.Classes
             return new List<HHVacancyModel>(); // TODO: думаю тут сделать ответ о том что данные получены и можно строить графики
         }
 
-        public async Task<List<HHVacancyModel>> GetVacanciesInDetailAsync()
-        {
-            return _vacancyService.VacanciesInDetail;
-        }
+        public List<HHVacancyModel> GetVacanciesInDetail() => _vacancyService.VacanciesInDetail;
 
-        
+        public List<Area> GetAreas() => _vacancyService.Areas;
+        public Dictionary<Area, List<HHVacancyModel>> GetVacanciesByRegionWithSalary() => _vacancyService.VacanciesByRegionWithSalary;
         public decimal GetAverageSalary() => GetAverageSalary(_vacancyService.VacanciesWithSalary);
         
-
         private decimal GetAverageSalary(List<HHVacancyModel> vacancies)
         {
             decimal avgFrom = vacancies.Sum(x => x.salary.from.Value) / vacancies.Count;
@@ -60,9 +57,5 @@ namespace VacancyInfo.Classes
         }
 
         public decimal GetRegionSalary(Area area) => GetAverageSalary(_vacancyService.VacanciesByRegionWithSalary[area]);
-
-        public List<Area> GetAreas() => _vacancyService.Areas;
-
-
     }
 }
