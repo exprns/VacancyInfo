@@ -9,7 +9,7 @@ namespace VacancyInfo.Services
 {
     public interface IJsonService
     {
-        public string JsonSerialize<T>(T objToSerialize);
+        public string JsonSerialize(object objToSerialize);
         public string JsonSerializeAllUnicode<T>(T requestBody);
     }
     public class JsonService : IJsonService
@@ -18,7 +18,7 @@ namespace VacancyInfo.Services
         {
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All)
         };
-        public string JsonSerialize<T>(T objToSerialize) => JsonSerializer.Serialize<T>(objToSerialize);
+        public string JsonSerialize(object objToSerialize) => JsonSerializer.Serialize(objToSerialize);
         public string JsonSerializeAllUnicode<T>(T objToSerialize) => JsonSerializer.Serialize<T>(objToSerialize, _allUnicodeOpt);
     }
 }

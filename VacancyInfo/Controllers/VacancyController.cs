@@ -24,17 +24,16 @@ namespace VacancyInfo.Controllers
 
         // GET api/Vacancy/Vacancies?name=5
         [HttpGet("Vacancies")]
-        public async Task<string> GetVacanciesAsync(string name)
+        public async Task<List<HHVacancyModel>> GetVacanciesAsync(string name)
         {
-            await _vacancyData.GetVacanciesAsync(name);
-            return ""; // TODO: думаю тут сделать ответ о том что данные получены и можно строить графики
+            return await _vacancyData.GetVacanciesAsync(name); // TODO: думаю тут сделать ответ о том что данные получены и можно строить графики
         }
 
         // GET api/Vacancy/VacanciesInDetail
         [HttpGet("VacanciesInDetail")]
-        public List<HHVacancyModel> GetVacanciesInDetail()
+        public async Task<List<HHVacancyModel>> GetVacanciesInDetailAsync()
         {
-            return _vacancyData.GetVacanciesInDetail();
+            return await _vacancyData.GetVacanciesInDetail();
         }
 
         // GET api/Vacancy/GetAvarageSalary
@@ -44,32 +43,29 @@ namespace VacancyInfo.Controllers
             return _vacancyData.GetAverageSalary();
         }
 
-        // GET api/Vacancy/GetAverageRegionSalary?areaId=2
-        [HttpGet("GetAverageRegionSalary", Name = "getAverageRegionSalary")]
-        public decimal GetAverageRegionSalary(int areaId)
-        {
-            var areas =  _vacancyData.GetAreas();
-            var regSalaries =  _vacancyData.GetRegionSalary(areas.First(x=>int.Parse(x.id) == areaId));
-            return regSalaries;
-        }
-
         // GET api/Vacancy/GetAreasJson
         [HttpGet("GetAreasJson", Name = "getAreasJson")]
         public string GetAreasJson()
         {
             var areas = _vacancyData.GetAreas();
-
-            string areasJson = _jsonService.JsonSerializeAllUnicode(areas);
-            return areasJson;
+            return _jsonService.JsonSerializeAllUnicode(areas);
         }
 
-        // GET api/Vacancy/GetVacanciesByRegionWithSalaryJson
-        [HttpGet("GetVacanciesByRegionWithSalaryJson", Name = "getVacanciesByRegionWithSalaryJson")]
-        public string GetVacanciesByRegionWithSalaryJson() 
-        { 
-            var vacs =  _vacancyData.GetVacanciesByRegionWithSalary();
-            string jsonVacs = _jsonService.JsonSerialize(vacs);
-            return jsonVacs;
+        // GET api/Vacancy/GetAverageRegionSalary?areaId=2
+        [HttpGet("GetAverageRegionSalary", Name = "getAverageRegionSalary")]
+        public decimal GetAverageRegionSalary(int areaId)
+        {
+            var areas = _vacancyData.GetAreas();
+            var regSalaries = _vacancyData.GetRegionAverageSalary(areaId);
+            return regSalaries;
+        }
+
+        // GET api/Vacancy/GetRegionVacanciesJson?areaId=5
+        [HttpGet("GetRegionVacanciesJson", Name = "getRegionVacanciesJson")]
+        public string GetRegionVacanciesJson(int areaId)
+        {
+            var vacs = _vacancyData.GetRegionVacancies(areaId);
+            return _jsonService.JsonSerializeAllUnicode(vacs);
         }
 
     }

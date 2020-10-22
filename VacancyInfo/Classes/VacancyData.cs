@@ -11,10 +11,10 @@ namespace VacancyInfo.Classes
     public interface IVacancyData
     {
         Task<List<HHVacancyModel>> GetVacanciesAsync(string name, string region = "");
-        List<HHVacancyModel> GetVacanciesInDetail();
+        Task<List<HHVacancyModel>> GetVacanciesInDetail();
         decimal GetAverageSalary();
-        Dictionary<Area, decimal> GetRegionsSalaries();
-        decimal GetRegionSalary(Area area);
+        Dictionary<int, decimal> GetRegionsSalaries();
+        decimal GetRegionAverageSalary(int areaId);
     }
 
     public class VacancyData : IVacancyData
@@ -32,12 +32,16 @@ namespace VacancyInfo.Classes
             return new List<HHVacancyModel>(); // TODO: думаю тут сделать ответ о том что данные получены и можно строить графики
         }
 
-        public List<HHVacancyModel> GetVacanciesInDetail() => _vacancyService.VacanciesInDetail;
+        public async Task<List<HHVacancyModel>> GetVacanciesInDetail() => await _vacancyService.GetVacanciesInDetail(); // TODO: думаю что стоит убрать отсюда все ф-и, которые сквозно вызывают функции из ваканси сервиса
 
         public List<Area> GetAreas() => _vacancyService.Areas;
-        public Dictionary<Area, List<HHVacancyModel>> GetVacanciesByRegionWithSalary() => _vacancyService.VacanciesByRegionWithSalary;
+        public Dictionary<int, List<HHVacancyModel>> GetVacanciesByRegionWithSalary() => _vacancyService.VacanciesByRegionWithSalary;
+        public Dictionary<int, List<HHVacancyModel>> GetVacanciesByRegion() => _vacancyService.VacanciesByRegion;
         public decimal GetAverageSalary() => GetAverageSalary(_vacancyService.VacanciesWithSalary);
-        
+        public decimal GetRegionAverageSalary(int areaId) => GetAverageSalary(_vacancyService.VacanciesByRegionWithSalary[areaId]);
+        public List<HHVacancyModel> GetRegionVacancies(int areaId) => _vacancyService.VacanciesByRegion[areaId];
+
+
         private decimal GetAverageSalary(List<HHVacancyModel> vacancies)
         {
             decimal avgFrom = vacancies.Sum(x => x.salary.from.Value) / vacancies.Count;
@@ -46,16 +50,14 @@ namespace VacancyInfo.Classes
             return (avgFrom + avgTo) / 2;
         }
 
-        public Dictionary<Area, decimal> GetRegionsSalaries()
+        public Dictionary<int, decimal> GetRegionsSalaries()
         {
-            Dictionary<Area, decimal> avgSalaryByReg = new Dictionary<Area, decimal>();
+            Dictionary<int, decimal> avgSalaryByReg = new Dictionary<int, decimal>();
             foreach(var regionVacancies in _vacancyService.VacanciesByRegionWithSalary)
             {
-                avgSalaryByReg.Add(regionVacancies.Key, GetRegionSalary(regionVacancies.Key));
+                avgSalaryByReg.Add(regionVacancies.Key, GetRegionAverageSalary(regionVacancies.Key));
             }
             return avgSalaryByReg;
         }
-
-        public decimal GetRegionSalary(Area area) => GetAverageSalary(_vacancyService.VacanciesByRegionWithSalary[area]);
     }
 }

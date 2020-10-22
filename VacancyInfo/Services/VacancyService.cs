@@ -12,8 +12,9 @@ namespace VacancyInfo.Services
     {
         public Task<List<HHVacancyModel>> GetVacancies(string vacancyName, string region, int page = 0);
         public List<HHVacancyModel> VacanciesWithSalary { get; }
-        public List<HHVacancyModel> VacanciesInDetail { get; }
-        public Dictionary<Area, List<HHVacancyModel>> VacanciesByRegionWithSalary { get; }
+        public Task<List<HHVacancyModel>> GetVacanciesInDetail();
+        public Dictionary<int, List<HHVacancyModel>> VacanciesByRegionWithSalary { get; }
+        public Dictionary<int, List<HHVacancyModel>> VacanciesByRegion { get; }
         public List<Area> Areas { get; }
     }
 
@@ -24,18 +25,15 @@ namespace VacancyInfo.Services
         private int vacanciesPerPage = 100;
         private List<HHVacancyModel> _vacancies;
         private List<HHVacancyModel> _vacanciesInDetail;
-        public List<HHVacancyModel> VacanciesInDetail
+        public async Task<List<HHVacancyModel>> GetVacanciesInDetail()
         {
-            get
-            {
-                if (!_vacanciesInDetail.Any())
-                    foreach (var vacancy in _vacancies)
-                    {
-                        _vacanciesInDetail.Add(GetVacancy(int.Parse(vacancy.id)).GetAwaiter().GetResult());
-                    }
+            if (!_vacanciesInDetail.Any())
+                foreach (var vacancy in _vacancies)
+                {
+                     _vacanciesInDetail.Add(await GetVacancy(int.Parse(vacancy.id)));
+                }
 
-                return _vacanciesInDetail;
-            }
+            return _vacanciesInDetail;
         }
 
         private List<Area> _areas;
@@ -53,22 +51,42 @@ namespace VacancyInfo.Services
         }
 
 
-        private Dictionary<Area, List<HHVacancyModel>> _vacanciesByRegionWithSalary;
-        public Dictionary<Area, List<HHVacancyModel>> VacanciesByRegionWithSalary
+        private Dictionary<int, List<HHVacancyModel>> _vacanciesByRegionWithSalary;
+        public Dictionary<int, List<HHVacancyModel>> VacanciesByRegionWithSalary
         {
             get
             {
                 if (_vacanciesByRegionWithSalary != null && _vacanciesByRegionWithSalary.Any())
                     return _vacanciesByRegionWithSalary;
 
-                _vacanciesByRegionWithSalary = new Dictionary<Area, List<HHVacancyModel>>();
-                Areas.ForEach(x => _vacanciesByRegionWithSalary.Add(x, new List<HHVacancyModel>()));
+                _vacanciesByRegionWithSalary = new Dictionary<int, List<HHVacancyModel>>();
+                Areas.ForEach(x => _vacanciesByRegionWithSalary.Add(int.Parse(x.id), new List<HHVacancyModel>()));
                 foreach (var vac in VacanciesWithSalary)
                 {
-                    _vacanciesByRegionWithSalary[vac.area].Add(vac);
+                    _vacanciesByRegionWithSalary[int.Parse(vac.area.id)].Add(vac);
                 }
 
                 return _vacanciesByRegionWithSalary;
+            }
+        }
+
+
+        private Dictionary<int, List<HHVacancyModel>> _vacanciesByRegion;
+        public Dictionary<int, List<HHVacancyModel>> VacanciesByRegion
+        {
+            get
+            {
+                if (_vacanciesByRegion != null && _vacanciesByRegion.Any())
+                    return _vacanciesByRegion;
+
+                _vacanciesByRegion = new Dictionary<int, List<HHVacancyModel>>();
+                Areas.ForEach(x => _vacanciesByRegion.Add(int.Parse(x.id), new List<HHVacancyModel>()));
+                foreach (var vac in _vacancies)
+                {
+                    _vacanciesByRegion[int.Parse(vac.area.id)].Add(vac);
+                }
+
+                return _vacanciesByRegion;
             }
         }
 
