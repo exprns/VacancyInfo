@@ -1,0 +1,55 @@
+.home {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+}
+
+.searchRow {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    padding-bottom: 12px;
+    padding-top: 40VH;
+    transition-duration: 0.5s;
+    transition-property: padding-top; 
+    transition-timing-function: ease-in;
+}
+
+.searchRowIsSearch {
+    padding-top: 25px;
+}
+
+.textField {
+    width: 550px;
+    transition-duration: 0.5s;
+    transition-property: width; 
+    transition-timing-function: ease-in;
+}
+
+.textFieldWidthAnimation {
+    width: 300px;
+}
+
+.mapAndMenu {
+    visible:false;
+    opacity: 0;
+    transition-property: opacity; 
+    transition-timing-function: ease-in;
+}
+
+.visibleMapAndMenu {
+    visible: true;
+    opacity: 1;
+}
+
+.autocomplite {
+    width: 450px;
+}

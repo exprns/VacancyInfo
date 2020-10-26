@@ -1,16 +1,11 @@
-import React, { useState } from 'react';
-import { TextField, Button } from '@material-ui/core'
-import { Map } from 'react-yandex-maps';
-import './Home.css'
+import React from 'react';
+import { Map as YMap } from 'react-yandex-maps';
+import { MAP_COLORS } from '../../constants';
+import { сustomizationRegions } from '../../utils';
+import './Map.css'
 
-export const Home = () => {
+export const Map = () => {
     const mapRef = React.createRef(null);
-    const [text, setText] = useState('');
-
-    const getFoo = () => {
-        fetch(`api/Vacancy/Vacancies?name=${text}`).then(res => console.log(res)).catch(err => console.error(err))
-    }
-
     const handleOnLoad = (ymaps) => {
         if (mapRef && mapRef.current) {
             let objectManager = new ymaps.ObjectManager();
@@ -30,22 +25,10 @@ export const Home = () => {
                     // Очередь раскраски.
                     var queue = [];
                     // Создадим объект regions, где ключи это ISO код региона.
-                    var regions = result.features.reduce(function (acc, feature) {
-                        // Добавим ISO код региона в качестве feature.id для objectManager.
-                        var iso = feature.properties.iso3166;
-                        feature.id = iso;
-                        // Добавим опции региона по умолчанию.
-                        feature.options = {
-                            fillOpacity: 0.6,
-                            strokeColor: "#FFF",
-                            strokeOpacity: 0.8
-                        };
-                        acc[iso] = feature;
-                        return acc;
-                    }, {});
+                    var regions = сustomizationRegions(result.features);
                     // Функция, которая раскрашивает регион и добавляет всех нераскрасшенных соседей в очередь на раскраску.
                     const paint = (iso) => {
-                        const allowedColors = COLORS.slice();
+                        const allowedColors = MAP_COLORS.slice();
                         // Получим ссылку на раскрашиваемый регион и на его соседей.
                         const region = regions[iso];
                         const neighbors = region.properties.neighbors;
@@ -88,42 +71,25 @@ export const Home = () => {
                         result.features.push(regions[reg]);
                     }
                     objectManager.add(result);
-                    /*   var polylabel = new ymaps.polylabel.create(mapRef.current, objectManager); */
                     mapRef.current.geoObjects.add(objectManager);
                     mapRef.current.geoObjects.events.add(['mouseenter', 'mouseleave'], function (e) {
                         console.log(e.get('type'), e.get('objectId'))
                         objectManager.objects.setObjectOptions(e.get('objectId'), {
-                            fillOpacity: e.get('type') == 'mouseenter' ? 1 : 0.6
+                            fillOpacity: e.get('type') === 'mouseenter' ? 1 : 0.6
                         });
                     });
                 });
         }
     };
-
-    const handleText = (e) => setText(e.target.value)
-    const COLORS = ["#F0F075", "#FB6C3F", "#3D4C76", "#49C0B5"];
-    return (
-        <div className="home">
-            <div className="row">
-                <TextField label="Поле для Масима" onChange={ handleText } />
-                <Button
-                    color="primary"
-                    onClick={ getFoo }
-                >
-                    Кнопочка
-            </Button>
-            </div>
-            <div className="map">
-                <Map
-                    instanceRef={ mapRef }
-                    defaultState={ { center: [65, 100], zoom: 2.5 } }
-                    onLoad={ handleOnLoad }
-                    // Подключаем модули регионов и ObjectManager
-                    modules={ ["borders", "ObjectManager", "pane.StaticPane", "templateLayoutFactory"] }
-                    width={ 1200 }
-                    height={ 500 }
-                />
-            </div>
-        </div>
-    );
+    return <div className="map">
+        <YMap
+            instanceRef={ mapRef }
+            defaultState={ { center: [65, 100], zoom: 2.5 } }
+            onLoad={ handleOnLoad }
+            // Подключаем модули регионов и ObjectManager
+            modules={ ["borders", "ObjectManager", "pane.StaticPane", "templateLayoutFactory"] }
+            width={ 1200 }
+            height={ 500 }
+        />
+    </div>
 }
