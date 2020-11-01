@@ -12,7 +12,10 @@ namespace VacancyInfo.Services
     {
         public Task<List<HHVacancyModel>> GetVacancies(string vacancyName, string region, int page = 0);
         public List<HHVacancyModel> VacanciesWithSalary { get; }
-        public Task<List<HHVacancyModel>> GetVacanciesInDetail();
+        public List<HHVacancyModel> Vacancies { get; }
+        public List<HHVacancyModel> VacanciesInDetail { get; }
+
+        public Task<List<HHVacancyModel>> GetVacanciesInDetail(List<HHVacancyModel> vacancies);
         public Dictionary<int, List<HHVacancyModel>> VacanciesByRegionWithSalary { get; }
         public Dictionary<int, List<HHVacancyModel>> VacanciesByRegion { get; }
         public List<Area> Areas { get; }
@@ -25,13 +28,16 @@ namespace VacancyInfo.Services
         private int vacanciesPerPage = 100;
         private List<HHVacancyModel> _vacancies;
         private List<HHVacancyModel> _vacanciesInDetail;
-        public async Task<List<HHVacancyModel>> GetVacanciesInDetail()
+        public List<HHVacancyModel> Vacancies => _vacancies;
+        public List<HHVacancyModel> VacanciesInDetail => _vacanciesInDetail;
+
+        public async Task<List<HHVacancyModel>> GetVacanciesInDetail(List<HHVacancyModel> vacancies)
         {
-            if (!_vacanciesInDetail.Any())
-                foreach (var vacancy in _vacancies)
-                {
-                     _vacanciesInDetail.Add(await GetVacancy(int.Parse(vacancy.id)));
-                }
+            _vacanciesInDetail = new List<HHVacancyModel>();
+            foreach (var vacancy in vacancies)
+            {
+                _vacanciesInDetail.Add(await GetVacancy(int.Parse(vacancy.id)));
+            }
 
             return _vacanciesInDetail;
         }
@@ -60,7 +66,7 @@ namespace VacancyInfo.Services
                     return _vacanciesByRegionWithSalary;
 
                 _vacanciesByRegionWithSalary = new Dictionary<int, List<HHVacancyModel>>();
-                Areas.ForEach(x => _vacanciesByRegionWithSalary.Add(int.Parse(x.id), new List<HHVacancyModel>()));
+                Areas.ForEach(x => _vacanciesByRegionWithSalary.Add(int.Parse(x.id), new List<HHVacancyModel>())); // TODO: по-моему тут можно упростить
                 foreach (var vac in VacanciesWithSalary)
                 {
                     _vacanciesByRegionWithSalary[int.Parse(vac.area.id)].Add(vac);

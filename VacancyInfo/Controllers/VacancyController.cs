@@ -34,7 +34,7 @@ namespace VacancyInfo.Controllers
         [HttpGet("VacanciesInDetail")]
         public async Task<List<HHVacancyModel>> GetVacanciesInDetailAsync()
         {
-            return await _vacancyService.GetVacanciesInDetail(); ;
+            return await _vacancyService.GetVacanciesInDetail(_vacancyService.Vacancies); ;
         }
 
         // GET api/Vacancy/GetAvarageSalary
@@ -48,16 +48,16 @@ namespace VacancyInfo.Controllers
         [HttpGet("GetAreasJson", Name = "getAreasJson")]
         public string GetAreasJson()
         {
-            var areas = _vacancyService.Areas;
-            return _jsonService.JsonSerializeAllUnicode(areas);
+            return _jsonService.JsonSerializeAllUnicode(_vacancyService.Areas);
         }
 
         // GET api/Vacancy/GetAverageRegionSalary?areaId=2
         [HttpGet("GetAverageRegionSalary", Name = "getAverageRegionSalary")]
         public decimal GetAverageRegionSalary(int areaId)
         {
-            var regSalaries = SalaryInfo.GetAverageSalary(_vacancyService.VacanciesByRegionWithSalary[areaId]);
-            return regSalaries;
+            var vacs = _vacancyService.VacanciesByRegionWithSalary[areaId];
+            if (!vacs.Any()) return -1;
+            return SalaryInfo.GetAverageSalary(_vacancyService.VacanciesByRegionWithSalary[areaId]);
         }
 
         // GET api/Vacancy/GetRegionVacanciesJson?areaId=5
@@ -66,6 +66,22 @@ namespace VacancyInfo.Controllers
         {
             var vacs = _vacancyService.VacanciesByRegion[areaId];
             return _jsonService.JsonSerializeAllUnicode(vacs);
+        }
+
+        // GET api/Vacancy/GetSkillsJson
+        [HttpGet("GetSkillsJson", Name = "GetSkillsJson")]
+        public string GetSkillsJson()
+        {
+            var skills = SkillsInfo.GetKeySkills(_vacancyService.VacanciesInDetail);
+            return _jsonService.JsonSerializeAllUnicode(skills);
+        }
+
+        // GET api/Vacancy/GetSkillsWithStatsJson
+        [HttpGet("GetSkillsWithStatsJson", Name = "GetSkillsWithStatsJson")]
+        public string GetSkillsWithStatsJson()
+        {
+            var skills = SkillsInfo.GetKeySkillsWithStats(_vacancyService.VacanciesInDetail);
+            return _jsonService.JsonSerializeAllUnicode(skills);
         }
 
     }
