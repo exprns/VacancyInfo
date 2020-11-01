@@ -8,16 +8,9 @@ using VacancyInfo.Services;
 
 namespace VacancyInfo.Classes
 {
-    public interface IVacancyData
+    static public class SalaryInfo
     {
-        decimal GetAverageSalary(List<HHVacancyModel> vacancies);
-        Dictionary<int, decimal> GetRegionsSalaries(Dictionary<int, List<HHVacancyModel>> vacanciesByRegionWithSalary);
-    }
-
-    public class VacancyData : IVacancyData
-    {
-
-        public decimal GetAverageSalary(List<HHVacancyModel> vacancies)
+        static public decimal GetAverageSalary(List<HHVacancyModel> vacancies)
         {
             decimal avgFrom = vacancies.Sum(x => x.salary.from.Value) / vacancies.Count;
             decimal avgTo = vacancies.Sum(x => x.salary.to.Value) / vacancies.Count;
@@ -25,7 +18,7 @@ namespace VacancyInfo.Classes
             return (avgFrom + avgTo) / 2;
         }
 
-        public Dictionary<int, decimal> GetRegionsSalaries(Dictionary<int, List<HHVacancyModel>> vacanciesByRegionWithSalary)
+        static public Dictionary<int, decimal> GetRegionsSalaries(Dictionary<int, List<HHVacancyModel>> vacanciesByRegionWithSalary)
         {
             Dictionary<int, decimal> avgSalaryByReg = new Dictionary<int, decimal>();
             foreach(var regionVacancies in vacanciesByRegionWithSalary)

@@ -13,14 +13,12 @@ namespace VacancyInfo.Controllers
     [ApiController]
     public class VacancyController : ControllerBase
     {
-        private VacancyData _vacancyData;
         private IJsonService _jsonService;
         private IVacancyService _vacancyService;
 
 
         public VacancyController(IVacancyService vacancyService, IJsonService jsonService)
         {
-            _vacancyData = new VacancyData();
             _vacancyService = vacancyService;
             _jsonService = jsonService;
         }
@@ -43,7 +41,7 @@ namespace VacancyInfo.Controllers
         [HttpGet("GetAvarageSalary",Name ="getAvarageSalary")]
         public decimal GetAverageSalary()
         {
-            return _vacancyData.GetAverageSalary(_vacancyService.VacanciesWithSalary);
+            return SalaryInfo.GetAverageSalary(_vacancyService.VacanciesWithSalary);
         }
 
         // GET api/Vacancy/GetAreasJson
@@ -58,8 +56,7 @@ namespace VacancyInfo.Controllers
         [HttpGet("GetAverageRegionSalary", Name = "getAverageRegionSalary")]
         public decimal GetAverageRegionSalary(int areaId)
         {
-            var areas = _vacancyService.Areas;
-            var regSalaries = _vacancyData.GetAverageSalary(_vacancyService.VacanciesByRegionWithSalary[areaId]);
+            var regSalaries = SalaryInfo.GetAverageSalary(_vacancyService.VacanciesByRegionWithSalary[areaId]);
             return regSalaries;
         }
 
