@@ -19,11 +19,10 @@ namespace VacancyInfo.Services
     {
         public Stream Result { get; set; }
         public bool GetPullRequestsError { get; set; }
-        private IHttpClientFactory _httpClientFactory;
-
+        private HttpClient _client;
         public RequestService(IHttpClientFactory httpClientFactory)
         {
-            _httpClientFactory = httpClientFactory;
+            _client = httpClientFactory.CreateClient();
         }
 
         public async Task<Stream> SendRequest(string requestBody)
@@ -32,8 +31,7 @@ namespace VacancyInfo.Services
 
             request.Headers.Add("Accept", "application/vnd.github.v3+json");
             request.Headers.Add("User-Agent", "HttpClientFactory-Sample");
-            var client = _httpClientFactory.CreateClient();
-            var response = await client.SendAsync(request);
+            var response = await _client.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {

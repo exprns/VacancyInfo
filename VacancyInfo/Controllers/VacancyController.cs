@@ -16,7 +16,6 @@ namespace VacancyInfo.Controllers
         private IJsonService _jsonService;
         private IVacancyService _vacancyService;
 
-
         public VacancyController(IVacancyService vacancyService, IJsonService jsonService)
         {
             _vacancyService = vacancyService;
@@ -34,7 +33,7 @@ namespace VacancyInfo.Controllers
         [HttpGet("VacanciesInDetail")]
         public async Task<List<HHVacancyModel>> GetVacanciesInDetailAsync()
         {
-            return await _vacancyService.GetVacanciesInDetail(_vacancyService.Vacancies); ;
+            return await _vacancyService.GetVacanciesInDetail(_vacancyService.VacanciesWithSalary.GetRange(1,5)); ;
         }
 
         // GET api/Vacancy/GetAvarageSalary
