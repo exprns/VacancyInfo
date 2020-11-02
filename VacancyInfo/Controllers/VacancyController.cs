@@ -33,7 +33,7 @@ namespace VacancyInfo.Controllers
         [HttpGet("VacanciesInDetail")]
         public async Task<List<HHVacancyModel>> GetVacanciesInDetailAsync()
         {
-            return await _vacancyService.GetVacanciesInDetail(_vacancyService.VacanciesWithSalary.GetRange(1,5)); ;
+            return await _vacancyService.GetVacanciesInDetail(_vacancyService.VacanciesWithSalary.GetRange(1,50));
         }
 
         // GET api/Vacancy/GetAvarageSalary
