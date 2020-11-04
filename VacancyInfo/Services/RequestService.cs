@@ -11,15 +11,12 @@ namespace VacancyInfo.Services
     public interface IRequestServices
     {
         public Task<Stream> SendRequest(string requestBody);
-        public bool GetPullRequestsError { get; set; }
-        public Stream Result { get; set; }
     }
 
     public class RequestService : IRequestServices
     {
-        public Stream Result { get; set; }
-        public bool GetPullRequestsError { get; set; }
         private HttpClient _client;
+
         public RequestService(IHttpClientFactory httpClientFactory)
         {
             _client = httpClientFactory.CreateClient();
@@ -40,7 +37,6 @@ namespace VacancyInfo.Services
             }
             else
             {
-                GetPullRequestsError = true;
                 return Stream.Null;
             }
         }

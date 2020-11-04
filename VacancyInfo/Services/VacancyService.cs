@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace VacancyInfo.Services
         public List<HHVacancyModel> Vacancies { get; }
         public List<HHVacancyModel> VacanciesInDetail { get; }
 
-        public Task<List<HHVacancyModel>> GetVacanciesInDetail(List<HHVacancyModel> vacancies);
+        public Task<List<HHVacancyModel>> GetVacanciesInDetail(IEnumerable<int> vacancyIDs);
         public Dictionary<int, List<HHVacancyModel>> VacanciesByRegionWithSalary { get; }
         public Dictionary<int, List<HHVacancyModel>> VacanciesByRegion { get; }
         public List<Area> Areas { get; }
@@ -31,15 +32,11 @@ namespace VacancyInfo.Services
         public List<HHVacancyModel> Vacancies => _vacancies;
         public List<HHVacancyModel> VacanciesInDetail => _vacanciesInDetail;
 
-        public async Task<List<HHVacancyModel>> GetVacanciesInDetail(List<HHVacancyModel> vacancies)
+        public VacancyService(IRequestServices requestServices)
         {
+            _requestServices = requestServices;
+            _vacancies = new List<HHVacancyModel>();
             _vacanciesInDetail = new List<HHVacancyModel>();
-            foreach (var vacancy in vacancies)
-            {
-                _vacanciesInDetail.Add(await GetVacancy(int.Parse(vacancy.id)));
-            }
-
-            return _vacanciesInDetail;
         }
 
         private List<Area> _areas;
@@ -96,11 +93,15 @@ namespace VacancyInfo.Services
             }
         }
 
-        public VacancyService(IRequestServices requestServices)
+        private List<HHVacancyModel> _vacanciesWithSalary;
+        public List<HHVacancyModel> VacanciesWithSalary
         {
-            _requestServices = requestServices;
-            _vacancies = new List<HHVacancyModel>();
-            _vacanciesInDetail = new List<HHVacancyModel>();
+            get
+            {
+                if (_vacanciesWithSalary == null)
+                    _vacanciesWithSalary = _vacancies.Where(x => x.salary?.from.HasValue == true && x.salary?.to.HasValue == true).ToList();
+                return _vacanciesWithSalary;
+            }
         }
 
         public async Task<List<HHVacancyModel>> GetVacancies(string vacancyName, string region, int page = 0)
@@ -108,13 +109,13 @@ namespace VacancyInfo.Services
             string requestBody = _hhVacancyRequest + "?text=" + vacancyName;
             if(region != "")
             {
-                requestBody += "&&" + region;
+                requestBody += "&&" + region; // TODO: переделать vacancies?text=велосипедист2&area=28
             }
             requestBody += "&per_page=" + vacanciesPerPage;
 
             var responce = await _requestServices.SendRequest(requestBody);
 
-            if (!_requestServices.GetPullRequestsError)
+            if (responce != Stream.Null)
             {
                 var items = await Items.ConvertFromStreamAsync(responce);
                 if (items.pages != 0 && page < items.pages)
@@ -131,22 +132,22 @@ namespace VacancyInfo.Services
             
         }
 
-        private List<HHVacancyModel> _vacanciesWithSalary;
-        public List<HHVacancyModel> VacanciesWithSalary
+        public async Task<List<HHVacancyModel>> GetVacanciesInDetail(IEnumerable<int> vacancyIDs)
         {
-            get
+            _vacanciesInDetail = new List<HHVacancyModel>();
+            foreach (var vacancyID in vacancyIDs)
             {
-                if(_vacanciesWithSalary == null) 
-                    _vacanciesWithSalary = _vacancies.Where(x => x.salary?.from.HasValue == true && x.salary?.to.HasValue == true).ToList();                   
-                return _vacanciesWithSalary;
-            }        
+                _vacanciesInDetail.Add(await GetVacancy(vacancyID));
+            }
+
+            return _vacanciesInDetail;
         }
 
         private async Task<HHVacancyModel> GetVacancy(int id)
         {
             string requestBody = _hhVacancyRequest+"/"+id;
             var responce = await _requestServices.SendRequest(requestBody);
-            if (!_requestServices.GetPullRequestsError)
+            if (responce != Stream.Null)
                 return await HHVacancyModel.ConvertFromStreamAsync(responce);
             return HHVacancyModel.NullObject();
         }

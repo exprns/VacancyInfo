@@ -33,9 +33,11 @@ namespace VacancyInfo.Controllers
         [HttpGet("VacanciesInDetail")]
         public async Task<List<HHVacancyModel>> GetVacanciesInDetailAsync()
         {
-            return await _vacancyService.GetVacanciesInDetail(_vacancyService.VacanciesWithSalary.GetRange(1,50));
+            var vacIds = _vacancyService.VacanciesWithSalary.GetRange(1, 50).Select(_=>int.Parse(_.id));
+            return await _vacancyService.GetVacanciesInDetail(vacIds);
         }
 
+        // TODO: всё что ниже - вынести в отдельные контроллеры
         // GET api/Vacancy/GetAvarageSalary
         [HttpGet("GetAvarageSalary",Name ="getAvarageSalary")]
         public decimal GetAverageSalary()
