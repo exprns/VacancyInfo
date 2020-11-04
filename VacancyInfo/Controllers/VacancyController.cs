@@ -33,7 +33,7 @@ namespace VacancyInfo.Controllers
         [HttpGet("VacanciesInDetail")]
         public async Task<List<HHVacancyModel>> GetVacanciesInDetailAsync()
         {
-            var vacIds = _vacancyService.VacanciesWithSalary.GetRange(1, 50).Select(_=>int.Parse(_.id));
+            var vacIds = _vacancyService.GetVacanciesWithSalary(_vacancyService.Vacancies).GetRange(1, 50).Select(_=>int.Parse(_.id));
             return await _vacancyService.GetVacanciesInDetail(vacIds);
         }
 
@@ -42,30 +42,30 @@ namespace VacancyInfo.Controllers
         [HttpGet("GetAvarageSalary",Name ="getAvarageSalary")]
         public decimal GetAverageSalary()
         {
-            return SalaryInfo.GetAverageSalary(_vacancyService.VacanciesWithSalary);
+            return SalaryInfo.GetAverageSalary(_vacancyService.GetVacanciesWithSalary(_vacancyService.Vacancies));
         }
 
         // GET api/Vacancy/GetAreasJson
         [HttpGet("GetAreasJson", Name = "getAreasJson")]
         public string GetAreasJson()
         {
-            return _jsonService.JsonSerializeAllUnicode(_vacancyService.Areas);
+            return _jsonService.JsonSerializeAllUnicode(_vacancyService.GetAreas(_vacancyService.Vacancies));
         }
 
         // GET api/Vacancy/GetAverageRegionSalary?areaId=2
         [HttpGet("GetAverageRegionSalary", Name = "getAverageRegionSalary")]
         public decimal GetAverageRegionSalary(int areaId)
         {
-            var vacs = _vacancyService.VacanciesByRegionWithSalary[areaId];
+            var vacs = _vacancyService.GetRegionVacancies(_vacancyService.GetVacanciesWithSalary(_vacancyService.Vacancies), areaId);
             if (!vacs.Any()) return -1;
-            return SalaryInfo.GetAverageSalary(_vacancyService.VacanciesByRegionWithSalary[areaId]);
+            return SalaryInfo.GetAverageSalary(vacs);
         }
 
         // GET api/Vacancy/GetRegionVacanciesJson?areaId=5
         [HttpGet("GetRegionVacanciesJson", Name = "getRegionVacanciesJson")]
         public string GetRegionVacanciesJson(int areaId)
         {
-            var vacs = _vacancyService.VacanciesByRegion[areaId];
+            var vacs = _vacancyService.GetRegionVacancies(_vacancyService.Vacancies ,areaId);
             return _jsonService.JsonSerializeAllUnicode(vacs);
         }
 

@@ -18,6 +18,7 @@ namespace VacancyInfo.Services
         {
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All)
         };
+
         public string JsonSerialize(object objToSerialize) => JsonSerializer.Serialize(objToSerialize);
         public string JsonSerializeAllUnicode<T>(T objToSerialize) => JsonSerializer.Serialize<T>(objToSerialize, _allUnicodeOpt);
     }

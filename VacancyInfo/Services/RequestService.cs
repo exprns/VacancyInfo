@@ -31,14 +31,9 @@ namespace VacancyInfo.Services
             var response = await _client.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
-            {
-                var responseStream = await response.Content.ReadAsStreamAsync();
-                return responseStream;
-            }
+                return await response.Content.ReadAsStreamAsync();
             else
-            {
                 return Stream.Null;
-            }
         }
     }
 }

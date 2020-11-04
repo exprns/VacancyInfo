@@ -12,14 +12,14 @@ namespace VacancyInfo.Services
 {    public interface IVacancyService
     {
         public Task<List<HHVacancyModel>> GetVacancies(string vacancyName, string region, int page = 0);
-        public List<HHVacancyModel> VacanciesWithSalary { get; }
+        public Task<List<HHVacancyModel>> GetVacanciesInDetail(IEnumerable<int> vacancyIDs);
+        public List<HHVacancyModel> GetRegionVacancies(List<HHVacancyModel> vacancies, int regId);
+
+        public List<Area> GetAreas(List<HHVacancyModel> vacancies);
+
+        public List<HHVacancyModel> GetVacanciesWithSalary(List<HHVacancyModel> vacancies);
         public List<HHVacancyModel> Vacancies { get; }
         public List<HHVacancyModel> VacanciesInDetail { get; }
-
-        public Task<List<HHVacancyModel>> GetVacanciesInDetail(IEnumerable<int> vacancyIDs);
-        public Dictionary<int, List<HHVacancyModel>> VacanciesByRegionWithSalary { get; }
-        public Dictionary<int, List<HHVacancyModel>> VacanciesByRegion { get; }
-        public List<Area> Areas { get; }
     }
 
     public class VacancyService : IVacancyService // TODO: подумать надо ли перенести это в Classes
@@ -39,78 +39,28 @@ namespace VacancyInfo.Services
             _vacanciesInDetail = new List<HHVacancyModel>();
         }
 
-        private List<Area> _areas;
-        public List<Area> Areas
+        public List<Area> GetAreas(List<HHVacancyModel> vacancies)
         {
-            get
-            {
-                if (_areas != null)
-                    return _areas;
-                _areas = _vacancies.Select(x=>x.area).GroupBy(p => int.Parse(p.id))
-                          .Select(g => g.First())
-                          .ToList();
-                return _areas;
-            }
+            return vacancies.Select(x => x.area).GroupBy(p => int.Parse(p.id))
+              .Select(g => g.First())
+              .ToList();
         }
 
-
-        private Dictionary<int, List<HHVacancyModel>> _vacanciesByRegionWithSalary;
-        public Dictionary<int, List<HHVacancyModel>> VacanciesByRegionWithSalary
+        public List<HHVacancyModel> GetRegionVacancies(List<HHVacancyModel> vacancies, int regId)
         {
-            get
-            {
-                if (_vacanciesByRegionWithSalary != null && _vacanciesByRegionWithSalary.Any())
-                    return _vacanciesByRegionWithSalary;
-
-                _vacanciesByRegionWithSalary = new Dictionary<int, List<HHVacancyModel>>();
-                Areas.ForEach(x => _vacanciesByRegionWithSalary.Add(int.Parse(x.id), new List<HHVacancyModel>())); // TODO: по-моему тут можно упростить
-                foreach (var vac in VacanciesWithSalary)
-                {
-                    _vacanciesByRegionWithSalary[int.Parse(vac.area.id)].Add(vac);
-                }
-
-                return _vacanciesByRegionWithSalary;
-            }
+            return vacancies.Where(x=> int.Parse(x.area.id) == regId).ToList();
         }
 
-
-        private Dictionary<int, List<HHVacancyModel>> _vacanciesByRegion;
-        public Dictionary<int, List<HHVacancyModel>> VacanciesByRegion
+        public List<HHVacancyModel> GetVacanciesWithSalary(List<HHVacancyModel> vacancies)
         {
-            get
-            {
-                if (_vacanciesByRegion != null && _vacanciesByRegion.Any())
-                    return _vacanciesByRegion;
-
-                _vacanciesByRegion = new Dictionary<int, List<HHVacancyModel>>();
-                Areas.ForEach(x => _vacanciesByRegion.Add(int.Parse(x.id), new List<HHVacancyModel>()));
-                foreach (var vac in _vacancies)
-                {
-                    _vacanciesByRegion[int.Parse(vac.area.id)].Add(vac);
-                }
-
-                return _vacanciesByRegion;
-            }
-        }
-
-        private List<HHVacancyModel> _vacanciesWithSalary;
-        public List<HHVacancyModel> VacanciesWithSalary
-        {
-            get
-            {
-                if (_vacanciesWithSalary == null)
-                    _vacanciesWithSalary = _vacancies.Where(x => x.salary?.from.HasValue == true && x.salary?.to.HasValue == true).ToList();
-                return _vacanciesWithSalary;
-            }
+            return vacancies.Where(x => x.salary?.from.HasValue == true && x.salary?.to.HasValue == true).ToList();
         }
 
         public async Task<List<HHVacancyModel>> GetVacancies(string vacancyName, string region, int page = 0)
         {
             string requestBody = _hhVacancyRequest + "?text=" + vacancyName;
             if(region != "")
-            {
                 requestBody += "&&" + region; // TODO: переделать vacancies?text=велосипедист2&area=28
-            }
             requestBody += "&per_page=" + vacanciesPerPage;
 
             var responce = await _requestServices.SendRequest(requestBody);
