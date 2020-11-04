@@ -11,7 +11,6 @@ namespace VacancyInfo.Classes
     {
         public List<Key_Skills> GetKeySkills(List<HHVacancyModel> vacancies);
         public List<KeySkillStats> GetKeySkillsWithStats(List<HHVacancyModel> vacancies);
-
     }
 
     static public class SkillsInfo // TODO: придумать как заменить info на что-то попонятнее
@@ -61,9 +60,8 @@ namespace VacancyInfo.Classes
             return new KeySkillStats() { 
                 KeySkill = skill, 
                 Price = SalaryInfo.GetAverageSalary(vacanciesHasSkill),
-                FrequencyInPercent = decimal.Divide(vacanciesHasSkill.Count,allVacanciesCnt) * 100 // TODO: найти другой способ приведения
+                FrequencyInPercent = decimal.Divide(vacanciesHasSkill.Count,allVacanciesCnt) * 100 
             };
         }
-
     }
 }
