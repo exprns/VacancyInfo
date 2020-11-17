@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Net.Http;
+using VacancyInfo.Classes;
 using VacancyInfo.Services;
 
 namespace VacancyInfo
@@ -26,6 +27,7 @@ namespace VacancyInfo
             services.AddHttpClient();
             services.AddTransient<IRequestServices,RequestService>();
             services.AddTransient<IJsonService, JsonService>();
+            services.AddTransient<IVacancyDataHandlerService, VacancyDataHandlerService>();
             services.AddSingleton<IVacancyService, VacancyService>();
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

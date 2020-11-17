@@ -13,11 +13,6 @@ namespace VacancyInfo.Services
     {
         public Task<List<HHVacancyModel>> GetVacancies(string vacancyName, string region, int page = 0);
         public Task<List<HHVacancyModel>> GetVacanciesInDetail(IEnumerable<int> vacancyIDs);
-        public List<HHVacancyModel> GetRegionVacancies(List<HHVacancyModel> vacancies, int regId);
-
-        public List<Area> GetAreas(List<HHVacancyModel> vacancies);
-
-        public List<HHVacancyModel> GetVacanciesWithSalary(List<HHVacancyModel> vacancies);
         public List<HHVacancyModel> Vacancies { get; }
         public List<HHVacancyModel> VacanciesInDetail { get; }
     }
@@ -37,23 +32,6 @@ namespace VacancyInfo.Services
             _requestServices = requestServices;
             _vacancies = new List<HHVacancyModel>();
             _vacanciesInDetail = new List<HHVacancyModel>();
-        }
-
-        public List<Area> GetAreas(List<HHVacancyModel> vacancies)
-        {
-            return vacancies.Select(x => x.area).GroupBy(p => int.Parse(p.id))
-              .Select(g => g.First())
-              .ToList();
-        }
-
-        public List<HHVacancyModel> GetRegionVacancies(List<HHVacancyModel> vacancies, int regId)
-        {
-            return vacancies.Where(x=> int.Parse(x.area.id) == regId).ToList();
-        }
-
-        public List<HHVacancyModel> GetVacanciesWithSalary(List<HHVacancyModel> vacancies)
-        {
-            return vacancies.Where(x => x.salary?.from.HasValue == true && x.salary?.to.HasValue == true).ToList();
         }
 
         public async Task<List<HHVacancyModel>> GetVacancies(string vacancyName, string region, int page = 0)
