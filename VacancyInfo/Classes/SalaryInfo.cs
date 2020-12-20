@@ -12,6 +12,7 @@ namespace VacancyInfo.Classes
     {
         static public decimal GetAverageSalary(List<HHVacancyModel> vacancies)
         {
+            // TODO: добавить получение стоимости доллара и евро
             decimal avgFrom = vacancies.Sum(x => x.salary.from.Value) / vacancies.Count; // TODO: добавить тут тесты
             decimal avgTo = vacancies.Sum(x => x.salary.to.Value) / vacancies.Count;
 
